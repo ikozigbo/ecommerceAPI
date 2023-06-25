@@ -9,10 +9,11 @@ const UserSchema = new mongoose.Schema(
     mobile: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     role: { type: String, default: "user" },
-    isBlocked: { type: String, default: false },
+    isBlocked: { type: Boolean, default: false },
     cart: { type: Array, default: [] },
     address: [{ type: mongoose.Schema.Types.ObjectId, ref: "Address" }],
     wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
+    refreshToken: { type: String },
   },
   { timestamps: true }
 );
