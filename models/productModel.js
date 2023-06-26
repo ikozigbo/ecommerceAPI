@@ -6,12 +6,12 @@ const productSchema = new mongoose.Schema(
     slug: { type: String, required: true, unique: true, lowercase: true },
     description: { type: String, required: true },
     price: { type: Number, required: true },
-    category: { type: mongoose.Schema.Types.ObjectId, ref: "Category" },
-    brand: { type: String, enum: ["Apple", "Andriod", "Others"] },
-    quantity: { type: Number },
+    category: { type: String, required: true },
+    brand: { type: String, required: true },
+    quantity: { type: Number, required: true },
     sold: { type: Number, default: 0 },
     images: { type: Array },
-    color: { type: String, enum: ["Black", "Brown", "Red"] },
+    color: { type: String, required: true },
     ratings: [
       {
         star: Number,
