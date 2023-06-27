@@ -77,7 +77,17 @@ const getAllProducts = asyncHandler(async (req, res) => {
       const fields = req.query.fields.split(",").join(" ");
       query = query.select(fields);
     } else {
-      query = query.select("__v");
+      query = query.select("-__v");
+    }
+
+    //pagination
+    const page = req.query.page;
+    const limit = req.query.limit;
+    const skip = (page - 1) * limit;
+    if (req.query.page && req.query.limit) {
+      query = query.skip(parseInt(skip)).limit(parseInt(limit));
+      const productCount = await Product.countDocuments();
+      if (skip >= productCount) throw new Error("this page does not exist");
     }
 
     const allProducts = await query;
