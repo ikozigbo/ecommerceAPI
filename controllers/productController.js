@@ -53,7 +53,34 @@ const getOneProduct = asyncHandler(async (req, res) => {
 
 const getAllProducts = asyncHandler(async (req, res) => {
   try {
-    const allProducts = await Product.find();
+    //Filtering
+    const queryObj = { ...req.query };
+    console.log(queryObj);
+    const excludeFields = ["page", "sort", "limit", "fields"];
+    excludeFields.forEach((el) => delete queryObj[el]);
+    // let queryStr = JSON.stringify(queryObj);
+    // queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
+    // console.log(JSON.parse(queryStr));
+
+    //const allProducts = await Product.find(JSON.parse(queryStr));
+    let query = Product.find(queryObj);
+
+    //Sorting
+    if (req.query.sort) {
+      const sortBy = req.query.sort.split(",").join(" ");
+      query = query.sort(sortBy);
+    } else {
+      query = query.sort("-createdAt");
+    }
+    //limiting the fields
+    if (req.query.fields) {
+      const fields = req.query.fields.split(",").join(" ");
+      query = query.select(fields);
+    } else {
+      query = query.select("__v");
+    }
+
+    const allProducts = await query;
     res.json({
       allProducts,
     });
