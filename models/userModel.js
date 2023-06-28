@@ -49,7 +49,7 @@ UserSchema.methods.isPasswordMatched = function (enteredPassword) {
   return bcrypt.compareSync(enteredPassword, this.password);
 };
 
-UserSchema.methods.creatPasswordResetToken = async function () {
+UserSchema.methods.createPasswordResetToken = async function () {
   const resetToken = crypto.randomBytes(32).toString("hex");
   this.passwordResetToken = crypto
     .createHash("sha256")
