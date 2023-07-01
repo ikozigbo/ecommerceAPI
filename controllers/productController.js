@@ -127,6 +127,35 @@ const addToWishlist = asyncHandler(async (req, res) => {
   }
 });
 
+const rating = asyncHandler(async (req, res) => {
+  const { _id } = req.user;
+  const { star, prodId } = req.body;
+  try {
+    const product = await Product.findById(prodId);
+    let alreadyRated = product.ratings.find(
+      (obj) => obj.postedBy.toString() === _id.toString()
+    );
+    if (alreadyRated) {
+    } else {
+      const ratedProduct = await Product.findByIdAndUpdate(
+        prodId,
+        {
+          $push: {
+            ratings: {
+              star: star,
+              postedBy: _id,
+            },
+          },
+        },
+        { new: true }
+      );
+      res.json(ratedProduct);
+    }
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
 module.exports = {
   createProduct,
   getOneProduct,
@@ -134,4 +163,5 @@ module.exports = {
   updateProduct,
   deleteProduct,
   addToWishlist,
+  rating,
 };
