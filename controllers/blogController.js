@@ -31,7 +31,7 @@ const getBlog = asyncHandler(async (req, res) => {
   const { id } = req.params;
   validateMongoId(id);
   try {
-    const getBlog = await Blog.findById(id);
+    const getBlog = await Blog.findById(id).populate("likes");
     await Blog.findByIdAndUpdate(
       id,
       {

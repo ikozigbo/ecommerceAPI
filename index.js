@@ -10,6 +10,9 @@ require("./configs/dbconnect");
 const authRouter = require("./routes/authRoutes");
 const productRouter = require("./routes/productRoutes");
 const blogRouter = require("./routes/blogRoutes");
+const prodcategoryRouter = require("./routes/productCategoryRoutes");
+const blogcategoryRouter = require("./routes/blogCatRoutes");
+const brandcategoryRouter = require("./routes/brandRoutes");
 const { notFound, errorHandler } = require("./middlewares/errorHandler");
 const morgan = require("morgan");
 const PORT = process.env.Port || 4041;
@@ -23,6 +26,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api/user", authRouter);
 app.use("/api/product", productRouter);
 app.use("/api/blog", blogRouter);
+app.use("/api/prodcategory", prodcategoryRouter);
+app.use("/api/blogcategory", blogcategoryRouter);
+app.use("/api/brand", brandcategoryRouter);
 
 //error handlers
 app.use(notFound);
