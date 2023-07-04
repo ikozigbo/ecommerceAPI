@@ -16,7 +16,9 @@ const blogSchema = new mongoose.Schema(
         "https://st2.depositphotos.com/1006899/8421/i/950/depositphotos_84219350-stock-photo-word-blog-suspended-by-ropes.jpg",
     },
     author: { type: String, default: "admin" },
+    images: [],
   },
+
   {
     toJSON: {
       virtuals: true,
