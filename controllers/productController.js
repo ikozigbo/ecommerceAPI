@@ -127,15 +127,31 @@ const addToWishlist = asyncHandler(async (req, res) => {
   }
 });
 
+// "ratings.$.star": This is the path to the field that we want to update.
+// In this case, it refers to the star field within an array element called ratings.
+// The $ symbol is a positional operator that represents the matched array element position for the update operation.
+
 const rating = asyncHandler(async (req, res) => {
   const { _id } = req.user;
-  const { star, prodId } = req.body;
+  const { star, prodId, comment } = req.body;
   try {
     const product = await Product.findById(prodId);
     let alreadyRated = product.ratings.find(
       (obj) => obj.postedBy.toString() === _id.toString()
     );
     if (alreadyRated) {
+      const updateRating = await Product.updateOne(
+        {
+          ratings: {
+            $elemMatch: alreadyRated,
+          },
+        },
+        {
+          $set: { "ratings.$.star": star, "ratings.$.comment": comment },
+        },
+        { new: true }
+      );
+      // res.json(updateRating);
     } else {
       const ratedProduct = await Product.findByIdAndUpdate(
         prodId,
@@ -143,14 +159,31 @@ const rating = asyncHandler(async (req, res) => {
           $push: {
             ratings: {
               star: star,
+              comment: comment,
               postedBy: _id,
             },
           },
         },
         { new: true }
       );
-      res.json(ratedProduct);
+      // res.json(ratedProduct);
     }
+    ////the next line of code is to calculate the average rating
+    const productWithRatings = await Product.findById(prodId);
+    //console.log(productWithRatings.ratings);
+    let totalRatings = productWithRatings.ratings.length;
+    let sumOfStars = productWithRatings.ratings
+      .map((rating) => rating.star)
+      .reduce((prev, curr) => prev + curr, 0);
+    let averageRating = Math.round(sumOfStars / totalRatings);
+    const finalUpdate = await Product.findByIdAndUpdate(
+      prodId,
+      {
+        averageRating,
+      },
+      { new: true }
+    );
+    res.json(finalUpdate);
   } catch (error) {
     throw new Error(error);
   }
