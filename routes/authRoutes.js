@@ -20,6 +20,8 @@ const {
   getUserCart,
   emptyCart,
   applyCoupon,
+  createOrder,
+  getOrders,
 } = require("../controllers/userController");
 const { authMiddleware, isAdmin } = require("../middlewares/authMiddleware");
 const router = express.Router();
@@ -44,5 +46,7 @@ router.get("/wishlist", authMiddleware, getWishList);
 router.get("/user-cart", authMiddleware, getUserCart);
 router.delete("/empty-cart", authMiddleware, emptyCart);
 router.post("/apply-coupon", authMiddleware, applyCoupon);
+router.post("/cash-order", authMiddleware, createOrder);
+router.get("/user-order", authMiddleware, getOrders);
 
 module.exports = router;

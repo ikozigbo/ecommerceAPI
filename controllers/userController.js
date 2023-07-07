@@ -5,11 +5,14 @@ const User = require("../models/userModel");
 const Product = require("../models/productModel");
 const Cart = require("../models/cartModel");
 const Coupon = require("../models/couponModel");
+const Order = require("../models/orderModel");
 const asyncHandler = require("express-async-handler");
 const { validateMongoId } = require("../utils/validateMongoDbId");
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
+const uniqid = require("uniqid");
 const { sendEmail } = require("./emailController");
+const { create } = require("domain");
 
 ////NOTE: status codes can be sent directly before throwing errors using res.status()
 
@@ -418,6 +421,64 @@ const applyCoupon = asyncHandler(async (req, res) => {
   }
 });
 
+const createOrder = asyncHandler(async (req, res) => {
+  const { COD, couponApplied } = req.body;
+  const { _id } = req.user;
+  validateMongoId(_id);
+  try {
+    if (!COD) throw new Error("create cash order failed");
+    // const user = await User.findById(_id);
+    const userCart = await Cart.findOne({ orderBy: _id });
+    let finalAmount = 0;
+    if (couponApplied && userCart.totalAfterDiscount) {
+      finalAmount = userCart.totalAfterDiscount;
+    } else {
+      finalAmount = userCart.cartTotal;
+    }
+    let newOrder = await new Order({
+      products: userCart.products,
+      paymentIntent: {
+        id: uniqid(),
+        method: "COD",
+        amount: finalAmount,
+        status: "Cash on Delivery",
+        created: Date.now(),
+        currency: "usd",
+      },
+      orderBy: _id,
+      orderStatus: "Cash on Delivery",
+    }).save();
+    ////this upadate product functionality needs to be worked on its not functional
+    // let update = userCart.products.map((item) => {
+    //   return {
+    //     updateOne: {
+    //       filter: { _id: item._id },
+    //       update: { $inc: { quantity: -item.count, sold: +item.count } },
+    //     },
+    //   };
+    // });
+    // const updated = await Product.bulkWrite(update, {});
+    res.json({ message: "success" });
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
+const getOrders = asyncHandler(async (req, res) => {
+  const { _id } = req.user;
+  validateMongoId(_id);
+  try {
+    const userOrders = await Order.findOne({ orderBy: _id })
+      .populate("products.product")
+      .exec();
+    res.json(userOrders);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
+const updateOrderStatus = asyncHandler(async (req, res) => {});
+
 module.exports = {
   createUser,
   loginUser,
@@ -439,4 +500,7 @@ module.exports = {
   getUserCart,
   emptyCart,
   applyCoupon,
+  createOrder,
+  getOrders,
+  updateOrderStatus,
 };
