@@ -40,6 +40,8 @@ const cloudinaryUploadImg = async (fileToUpload) => {
       } else {
         resolve({
           url: result.secure_url,
+          asset_id: result.asset_id,
+          public_id: result.public_id,
           // resource_type: result.resource_type,
         });
       }
@@ -47,4 +49,21 @@ const cloudinaryUploadImg = async (fileToUpload) => {
   });
 };
 
-module.exports = { cloudinaryUploadImg };
+const cloudinaryDeleteImg = async (fileToDelete) => {
+  return new Promise((resolve, reject) => {
+    cloudinary.uploader.destroy(fileToDelete, (error, result) => {
+      if (error) {
+        reject(error);
+      } else {
+        resolve({
+          url: result.secure_url,
+          asset_id: result.asset_id,
+          public_id: result.public_id,
+          // resource_type: result.resource_type,
+        });
+      }
+    });
+  });
+};
+
+module.exports = { cloudinaryUploadImg, cloudinaryDeleteImg };

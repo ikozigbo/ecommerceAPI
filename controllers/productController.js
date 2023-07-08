@@ -3,7 +3,10 @@ const User = require("../models/userModel");
 const asyncHandler = require("express-async-handler");
 const slugify = require("slugify");
 const { validateMongoId } = require("../utils/validateMongoDbId");
-const { cloudinaryUploadImg } = require("../utils/cloudinary");
+const {
+  cloudinaryUploadImg,
+  cloudinaryDeleteImg,
+} = require("../utils/cloudinary");
 const fs = require("fs");
 
 const createProduct = asyncHandler(async (req, res) => {
@@ -222,6 +225,8 @@ const uploadImages = asyncHandler(async (req, res) => {
     throw new Error(error);
   }
 });
+
+/// delete image functionality pending
 
 module.exports = {
   createProduct,
